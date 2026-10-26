@@ -1,0 +1,35 @@
+model_list:
+  - model_name: gemini-flash-lab
+    litellm_params:
+      model: gemini/gemini-2.0-flash
+      api_key: os.environ/GEMINI_API_KEY
+
+  - model_name: ollama-lab
+    litellm_params:
+      model: ollama/llama3.2:3b
+      api_base: http://host.docker.internal:11434
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  store_model_in_db: true
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+  success_callback: ["file"]
+  failure_callback: ["file"]
+  json_logs: true
+
+guardrails:
+  - guardrail_name: presidio-pii
+    litellm_params:
+      guardrail: presidio
+      mode: pre_call
+      presidio_analyzer_api_base: http://presidio-analyzer:5002
+      presidio_anonymizer_api_base: http://presidio-anonymizer:5001
+      pii_entities_config:
+        CREDIT_CARD: block
+        US_SSN: block
+        EMAIL_ADDRESS: mask
+      presidio_language: en
